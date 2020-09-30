@@ -1,0 +1,83 @@
+    
+    public interface IClient {
+    
+    	/**
+     	* Connect to the Voximplant cloud.
+     	*
+     	* @throws IllegalStateException If the connection is currently establishing or already established. Use {@link IClient#getClientState()} to check current state (since 2.3.2).
+   	 	 */
+    	void connect() throws IllegalStateException;
+    
+    
+    	/**
+    	 * Login to specified Voximplant application with password.
+    	 *
+    	 * @param user     Full user name, including app and account name, like someuser@someapp.youraccount.voximplant.com
+    	 * @param password User password
+    	 */
+    	void login(String user, String password);
+    	
+    	.....
+    	
+    	void setListener(IClientListener listener);
+    
+    }
+    
+    
+    public interface IClientListener {
+		    
+		/**
+     	* Invoked after connection to Voximplant Cloud was established successfully
+     	*
+     	* @see IClient#connect()
+     	*/
+    	void onConnectionEstablished();
+
+    	/**
+     	* Invoked if connection to Voximplant Cloud couldn't be established
+     	*
+     	* @param error Failure reason description
+    	* @see IClient#connect()
+     	*/
+    	void onConnectionFailed(String error);
+    
+    
+    	/**
+     	* Invoked when login process finished successfully
+     	*
+     	* @param displayName Display name of logged in user
+     	* @param authParams Auth parameters that can be used to login using access token
+     	*/
+   	 	void onLoginSuccessful(String displayName, AuthParams authParams);
+
+    	/**
+     	* Invoked when login process failed
+     	*
+     	* @param loginError Failure reason
+     	*/
+    	void onLoginFailed(LoginError loginError);    
+
+    }
+
+    
+    ======================================
+    
+    @Mock
+    private IClientListener mLoginListener;
+    
+    private IClient mClient = Library.getClientInstance();
+    
+    
+    @Test
+    public void test_01_login_with_password() {
+        InOrder inOrder = inOrder(mClientListener);
+
+        mClient.connect();
+        inOrder.verify(mClientListener, timeout(SHORT_TIMEOUT)).onConnectionEstablished();
+
+        mClient.login(USER, PASSWORD);
+        inOrder.verify(mClientListener, timeout(SHORT_TIMEOUT)).onLoginSuccessful(eq(DISPLAY_NAME), any(AuthParams.class));
+
+        mClient.disconnect();
+        inOrder.verify(mClientListener, timeout(SHORT_TIMEOUT)).onConnectionClosed();
+    }
