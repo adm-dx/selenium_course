@@ -16,7 +16,7 @@ try:
     filePath = os.path.join(currentDir, 'client.txt')
     firstNameField.send_keys("Roman")
     lastNameField.send_keys("Miller")
-    emailField.send_keys("adm.dx@outlook.com")
+    emailField.send_keys("test@outlook.com")
     inputBtn.send_keys(filePath)
     submitBtn.click()
 finally:
